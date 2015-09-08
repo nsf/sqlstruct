@@ -196,6 +196,19 @@ func Columns(s interface{}) string {
 	return strings.Join(cols(s), ", ")
 }
 
+// ColumnsFiltered does what Columns does, but filters the fields using a map.
+func ColumnsFiltered(s interface{}, filt map[string]bool) string {
+	names := cols(s)
+	filtered := make([]string, 0, len(filt))
+	for _, n := range names {
+		if _, ok := filt[n]; !ok {
+			continue
+		}
+		filtered = append(filtered, n)
+	}
+	return strings.Join(filtered, ", ")
+}
+
 // ColumnsAliased works like Columns except it prefixes the resulting column name with the
 // given alias.
 //
@@ -207,6 +220,19 @@ func ColumnsAliased(s interface{}, alias string) string {
 	names := cols(s)
 	aliased := make([]string, 0, len(names))
 	for _, n := range names {
+		aliased = append(aliased, alias+"."+n+" AS "+alias+"_"+n)
+	}
+	return strings.Join(aliased, ", ")
+}
+
+// ColumnsAliasedFiltered does what ColumnsAliased does, but filters the fields using a map.
+func ColumnsAliasedFiltered(s interface{}, alias string, filt map[string]bool) string {
+	names := cols(s)
+	aliased := make([]string, 0, len(filt))
+	for _, n := range names {
+		if _, ok := filt[n]; !ok {
+			continue
+		}
 		aliased = append(aliased, alias+"."+n+" AS "+alias+"_"+n)
 	}
 	return strings.Join(aliased, ", ")
